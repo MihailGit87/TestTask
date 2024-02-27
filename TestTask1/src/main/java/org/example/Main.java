@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
     public static void main(String[] args) {
@@ -22,7 +24,7 @@ public class Main {
 //            }
 
         String filePath = "/home/mikhailvasilev/TestTask/lng.txt";
-
+//      String fileUrl = "https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-4.txt.gz";
         try {
 //            URL url = new URL(fileUrl);
 //            ReadableByteChannel channel = Channels.newChannel(url.openStream());
@@ -40,6 +42,7 @@ public class Main {
 
             Set<String> uniqueLines = Collections.newSetFromMap(new ConcurrentHashMap<>());
             Map<String, List<String>> groups = new HashMap<>();
+            Lock lock = new ReentrantLock();
 
             for (String line : lines) {
                 executorService.execute(() -> {
@@ -50,19 +53,24 @@ public class Main {
                     uniqueLines.add(line);
 
                     boolean foundGroup = false;
-                    for (String groupKey : groups.keySet()) {
-                        List<String> group = groups.get(groupKey);
-                        if (hasCommonValues(line, group)) {
-                            group.add(line);
-                            foundGroup = true;
-                            break;
+                    lock.lock();
+                    try {
+                        for (String groupKey : groups.keySet()) {
+                            List<String> group = groups.get(groupKey);
+                            if (hasCommonValues(line, group)) {
+                                group.add(line);
+                                foundGroup = true;
+                                break;
+                            }
                         }
-                    }
 
-                    if (!foundGroup) {
-                        List<String> newGroup = new ArrayList<>();
-                        newGroup.add(line);
-                        groups.put(line, newGroup);
+                        if (! foundGroup) {
+                            List<String> newGroup = new ArrayList<>();
+                            newGroup.add(line);
+                            groups.put(line, newGroup);
+                        }
+                    } finally {
+                        lock.unlock();
                     }
                 });
             }
@@ -103,7 +111,7 @@ public class Main {
             String[] values2 = line2.split(";");
             for (String value1 : values1) {
                 for (String value2 : values2) {
-                    if (value1.equals(value2) && !value1.isEmpty()) {
+                    if (value1.equals(value2) && ! value1.isEmpty()) {
                         return true;
                     }
                 }
@@ -112,5 +120,3 @@ public class Main {
         return false;
     }
 }
-
-//String fileUrl = "https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-4.txt.gz";
