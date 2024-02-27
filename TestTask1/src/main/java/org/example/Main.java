@@ -1,9 +1,10 @@
 package org.example;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -17,14 +18,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
     public static void main(String[] args) {
-        // Проверяем, что передан аргумент с URL-адресом файла
-//        if (args.length < 1) {
-//            System.out.println("Необходимо указать URL-адрес файла в аргументах командной строки.");
-//            return;
-//            }
 
-        String filePath = "/home/mikhailvasilev/TestTask/lng.txt";
-//      String fileUrl = "https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-4.txt.gz";
+        String filePath = "/home/mikhailvasilev/TestTask/lng.txt"; //распакованный файл
+//      String fileUrl = "https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-4.txt.gz";  //юрл файл
         try {
 //            URL url = new URL(fileUrl);
 //            ReadableByteChannel channel = Channels.newChannel(url.openStream());
